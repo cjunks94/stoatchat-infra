@@ -24,6 +24,9 @@ RUN pnpm --filter "@lingui-solid/babel-plugin-lingui-macro" run build || true
 # Generate panda CSS
 RUN pnpm --filter client run prepare
 
+# Compile i18n catalogs (lingui)
+RUN pnpm --filter client exec lingui compile
+
 # Build the client
 RUN pnpm --filter client exec vite build
 
