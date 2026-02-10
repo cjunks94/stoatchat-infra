@@ -39,5 +39,5 @@
 		reverse_proxy http://livekit:7880
 	}
 
-	reverse_proxy http://web:5000
+	reverse_proxy http://web:80
 }
