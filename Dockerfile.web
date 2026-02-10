@@ -7,7 +7,7 @@ WORKDIR /app
 RUN npm install -g pnpm@10.10.0 && apt-get update && apt-get install -y git
 
 # Clone the frontend repo with submodules
-RUN git clone --depth 1 --recurse-submodules https://github.com/stoatchat/stoatchat.git .
+RUN git clone --depth 1 --recurse-submodules https://github.com/revoltchat/frontend.git .
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
