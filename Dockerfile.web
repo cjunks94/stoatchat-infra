@@ -30,7 +30,8 @@ RUN pnpm --filter client run prepare
 RUN pnpm --filter client exec lingui extract
 RUN pnpm --filter client exec lingui compile --typescript
 
-# Build the client
+# Build the client (increase heap size for large build)
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN pnpm --filter client exec vite build
 
 # Production stage - serve with Caddy
