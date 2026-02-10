@@ -1,5 +1,8 @@
 port: 7880
 rtc:
+  # REQUIRED: Set this to your server's public IP address
+  # Without this, LiveKit will fail to start with "invalid argument to Intn" error
+  node_ip: YOUR_PUBLIC_IP_HERE
   port_range_start: 7882
   port_range_end: 7882
   tcp_port: 7881

@@ -28,7 +28,7 @@ This repository contains configurations and instructions that can be used for de
 > amd64 builds are not currently available for the web client.
 
 > [!NOTE]
-> This guide does not include working voice channels ([#138](https://github.com/revoltchat/self-hosted/pull/138#issuecomment-2762682655)). A [rework](https://github.com/revoltchat/backend/issues/313) is currently in progress.
+> Voice channels require additional configuration. See [Voice Channel Setup](#voice-channel-setup) below.
 
 ## Table of Contents
 
@@ -40,6 +40,7 @@ This repository contains configurations and instructions that can be used for de
   - [Placing Behind Another Reverse-Proxy or Another Port](#placing-behind-another-reverse-proxy-or-another-port)
   - [Insecurely Expose the Database](#insecurely-expose-the-database)
   - [Mongo Compatibility](#mongo-compatibility)
+  - [Voice Channel Setup](#voice-channel-setup)
   - [Making Your Instance Invite-only](#making-your-instance-invite-only)
 - [Notices](#notices)
 - [Security Advisories](#security-advisories)
@@ -335,6 +336,41 @@ services:
   database:
     image: mongo:4.4
 ```
+
+### Voice Channel Setup
+
+Voice channels use [LiveKit](https://livekit.io/) for real-time communication. To enable voice:
+
+1. **Configure your public IP** in `livekit.yml`:
+
+   ```yaml
+   rtc:
+     node_ip: YOUR_PUBLIC_IP_HERE  # Required! Get this with: curl -4 ifconfig.me
+   ```
+
+   > [!WARNING]
+   > Without `node_ip` set, LiveKit will crash with `panic: invalid argument to Intn`. The `use_external_ip: true` option often fails to auto-detect the IP correctly.
+
+2. **Open the required ports** in your firewall:
+
+   ```bash
+   ufw allow 7880/tcp  # LiveKit API
+   ufw allow 7881/tcp  # LiveKit RTC TCP
+   ufw allow 7882/udp  # LiveKit RTC UDP
+   ```
+
+3. **Restart the LiveKit container**:
+
+   ```bash
+   docker restart stoat-livekit-1
+   ```
+
+4. **Verify it's running** (not in a restart loop):
+
+   ```bash
+   docker ps | grep livekit
+   # Should show "Up X minutes" not "Restarting"
+   ```
 
 ### Making Your Instance Invite-only
 
