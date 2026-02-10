@@ -63,7 +63,7 @@ port: 7880
 rtc:
   port_range_start: 7882
   port_range_end: 7882
-  use_external_ip: true
+  tcp_port: 7881
 redis:
   address: redis:6379
 keys:
