@@ -32,6 +32,17 @@ RUN pnpm --filter client exec lingui compile --typescript
 
 # Build the client (increase heap size for large build)
 ENV NODE_OPTIONS="--max-old-space-size=4096"
+
+# Set API URLs for your instance
+ARG VITE_API_URL=https://chat.cjunker.dev/api
+ARG VITE_WS_URL=wss://chat.cjunker.dev/ws
+ARG VITE_MEDIA_URL=https://chat.cjunker.dev/autumn
+ARG VITE_PROXY_URL=https://chat.cjunker.dev/january
+ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_WS_URL=$VITE_WS_URL
+ENV VITE_MEDIA_URL=$VITE_MEDIA_URL
+ENV VITE_PROXY_URL=$VITE_PROXY_URL
+
 RUN pnpm --filter client exec vite build
 
 # Production stage - serve with Caddy
@@ -41,11 +52,6 @@ FROM caddy:2-alpine
 COPY --from=builder /app/packages/client/dist /srv
 
 # Caddy config for SPA
-RUN echo ':80 { \
-    root * /srv \
-    encode gzip \
-    try_files {path} /index.html \
-    file_server \
-}' > /etc/caddy/Caddyfile
+RUN printf ':80 {\n\troot * /srv\n\tencode gzip\n\ttry_files {path} /index.html\n\tfile_server\n}\n' > /etc/caddy/Caddyfile
 
 EXPOSE 80
