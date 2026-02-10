@@ -169,6 +169,39 @@ services:
         target: /Revolt.toml
     restart: always
 
+  # LiveKit: Voice/Video server
+  livekit:
+    image: livekit/livekit-server:latest
+    command: --config /etc/livekit.yml
+    restart: always
+    depends_on:
+      redis:
+        condition: service_started
+    ports:
+      - "7880:7880"
+      - "7881:7881"
+      - "7882:7882/udp"
+    volumes:
+      - ./livekit.yml:/etc/livekit.yml
+
+  # Voice ingress daemon (LiveKit webhook handler)
+  voice-ingress:
+    image: ghcr.io/revoltchat/voice-ingress:20250930-2
+    restart: always
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      rabbit:
+        condition: service_healthy
+      livekit:
+        condition: service_started
+    volumes:
+      - type: bind
+        source: ./Revolt.toml
+        target: /Revolt.toml
+
   # Create buckets for minio.
   createbuckets:
     image: docker.io/minio/mc
