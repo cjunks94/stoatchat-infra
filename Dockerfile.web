@@ -12,11 +12,14 @@ RUN git clone --depth 1 --recurse-submodules https://github.com/revoltchat/front
 # Install dependencies
 RUN pnpm install --frozen-lockfile
 
-# Build stoat.js dependency first
+# Build all workspace dependencies in order
+RUN pnpm --filter "@lingui-solid/babel-plugin-extract-messages" run build || true
+RUN pnpm --filter "@lingui-solid/babel-plugin-lingui-macro" run build || true
 RUN pnpm --filter stoat.js run build
-
-# Build solid-livekit-components
 RUN pnpm --filter solid-livekit-components run build || true
+
+# Generate panda CSS
+RUN pnpm --filter client run prepare
 
 # Build the client
 RUN pnpm --filter client exec vite build
