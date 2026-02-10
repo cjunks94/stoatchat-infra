@@ -1,16 +1,35 @@
 #!/usr/bin/env bash
 
+# Usage: ./generate_config.sh <domain> [--invite-only]
+
+DOMAIN="$1"
+INVITE_ONLY=false
+
+# Parse flags
+for arg in "$@"; do
+  case $arg in
+    --invite-only)
+      INVITE_ONLY=true
+      ;;
+  esac
+done
+
+if [ -z "$DOMAIN" ]; then
+  echo "Usage: ./generate_config.sh <domain> [--invite-only]"
+  exit 1
+fi
+
 # set hostname for Caddy
-echo "HOSTNAME=https://$1" > .env.web
-echo "REVOLT_PUBLIC_URL=https://$1/api" >> .env.web
+echo "HOSTNAME=https://$DOMAIN" > .env.web
+echo "REVOLT_PUBLIC_URL=https://$DOMAIN/api" >> .env.web
 
 # hostnames
 echo "[hosts]" >> Revolt.toml
-echo "app = \"https://$1\"" >> Revolt.toml
-echo "api = \"https://$1/api\"" >> Revolt.toml
-echo "events = \"wss://$1/ws\"" >> Revolt.toml
-echo "autumn = \"https://$1/autumn\"" >> Revolt.toml
-echo "january = \"https://$1/january\"" >> Revolt.toml
+echo "app = \"https://$DOMAIN\"" >> Revolt.toml
+echo "api = \"https://$DOMAIN/api\"" >> Revolt.toml
+echo "events = \"wss://$DOMAIN/ws\"" >> Revolt.toml
+echo "autumn = \"https://$DOMAIN/autumn\"" >> Revolt.toml
+echo "january = \"https://$DOMAIN/january\"" >> Revolt.toml
 
 # VAPID keys
 echo "" >> Revolt.toml
@@ -29,7 +48,7 @@ echo "encryption_key = \"$(openssl rand -base64 32)\"" >> Revolt.toml
 LIVEKIT_SECRET=$(openssl rand -base64 32 | tr -d '/+=')
 echo "" >> Revolt.toml
 echo "[hosts.livekit]" >> Revolt.toml
-echo "worldwide = \"wss://$1/livekit\"" >> Revolt.toml
+echo "worldwide = \"wss://$DOMAIN/livekit\"" >> Revolt.toml
 echo "" >> Revolt.toml
 echo "[api.livekit.nodes.worldwide]" >> Revolt.toml
 echo "url = \"http://livekit:7880\"" >> Revolt.toml
@@ -52,3 +71,18 @@ keys:
 logging:
   level: info
 EOF
+
+# Registration settings
+echo "" >> Revolt.toml
+echo "[api.registration]" >> Revolt.toml
+if [ "$INVITE_ONLY" = true ]; then
+  echo "invite_only = true" >> Revolt.toml
+  echo ""
+  echo "✓ Invite-only mode enabled"
+  echo "  Create invites with: docker compose exec database mongosh --eval 'use revolt; db.invites.insertOne({ _id: \"your-code\" })'"
+else
+  echo "invite_only = false" >> Revolt.toml
+fi
+
+echo ""
+echo "✓ Config generated for $DOMAIN"
