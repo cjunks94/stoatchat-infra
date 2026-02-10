@@ -184,6 +184,26 @@ services:
     volumes:
       - ./livekit.yml:/etc/livekit.yml
 
+  # Voice ingress daemon (built from source)
+  voice-ingress:
+    build:
+      context: .
+      dockerfile: Dockerfile.voice-ingress
+    restart: always
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      rabbit:
+        condition: service_healthy
+      livekit:
+        condition: service_started
+    volumes:
+      - type: bind
+        source: ./Revolt.toml
+        target: /Revolt.toml
+
   # Create buckets for minio.
   createbuckets:
     image: docker.io/minio/mc
