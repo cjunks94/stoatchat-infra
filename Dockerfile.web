@@ -18,8 +18,10 @@ RUN pnpm --filter client exec node scripts/copyAssets.mjs
 # Build workspace dependencies in order
 RUN pnpm --filter stoat.js run build
 RUN pnpm --filter solid-livekit-components run build || true
-RUN pnpm --filter "@lingui-solid/babel-plugin-extract-messages" run build || true
-RUN pnpm --filter "@lingui-solid/babel-plugin-lingui-macro" run build || true
+
+# Build lingui-solid packages (macro first, then extract-messages which depends on it)
+RUN pnpm --filter "@lingui-solid/babel-plugin-lingui-macro" run build
+RUN pnpm --filter "@lingui-solid/babel-plugin-extract-messages" run build
 
 # Generate panda CSS
 RUN pnpm --filter client run prepare
