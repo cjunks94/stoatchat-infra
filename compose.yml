@@ -101,9 +101,14 @@ services:
         target: /Revolt.toml
     restart: always
 
-  # Web App (pre-built image with voice support)
+  # Web App
+  # Build on VPS: docker compose build web
+  # Or pull from GHCR: docker pull ghcr.io/cjunks94/stoat-web:latest
   web:
     image: ghcr.io/cjunks94/stoat-web:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.web
     restart: always
     env_file: .env.web
 
