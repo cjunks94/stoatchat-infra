@@ -27,8 +27,8 @@ RUN pnpm --filter "@lingui-solid/babel-plugin-extract-messages" run build
 RUN pnpm --filter client run prepare
 
 # Extract and compile i18n catalogs (lingui)
-RUN pnpm --filter client exec lingui extract --clean
-RUN pnpm --filter client exec lingui compile
+RUN pnpm --filter client exec lingui extract
+RUN pnpm --filter client exec lingui compile --typescript
 
 # Build the client
 RUN pnpm --filter client exec vite build
