@@ -101,11 +101,10 @@ services:
         target: /Revolt.toml
     restart: always
 
-  # Web App (built from source for voice support)
+  # Web App
+  # Note: Voice UI not working in pre-built image - see VOICE_CHANNELS.md
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile.web
+    image: ghcr.io/revoltchat/client:master
     restart: always
     env_file: .env.web
 
